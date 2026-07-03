@@ -54,3 +54,16 @@ class Action:
     def run_command(self, cmd: List[str]) -> subprocess.CompletedProcess:
         """Helper to run a subprocess safely without shell execution."""
         return subprocess.run(cmd, capture_output=True, text=True, check=False)
+        
+    def run_ps(self, script_block: str) -> Dict[str, Any]:
+        """Runs a PowerShell script block and parses the JSON output."""
+        # Wrap the script block to force JSON output
+        wrapped = f"try {{ $Result = & {{ {script_block} }}; if ($Result -ne $null) {{ $Result | ConvertTo-Json -Compress }} else {{ '{{}}' }} }} catch {{ @{{ error = $_.Exception.Message }} | ConvertTo-Json -Compress }}"
+        cmd = ["powershell", "-NoProfile", "-NonInteractive", "-Command", wrapped]
+        res = self.run_command(cmd)
+        if res.returncode != 0 and not res.stdout.strip():
+            return {"error": res.stderr.strip() or f"PowerShell exited with code {res.returncode}"}
+        try:
+            return json.loads(res.stdout.strip() or "{}")
+        except json.JSONDecodeError:
+            return {"error": "Failed to parse PowerShell output", "raw": res.stdout}
