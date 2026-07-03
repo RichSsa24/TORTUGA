@@ -1,130 +1,119 @@
 <div align="center">
-  <img src="docs/logo.png" alt="TORTUGA Logo" width="220" />
+  <img src="docs/logo.png" alt="TORTUGA Logo" width="220" onerror="this.style.display='none'">
   
-  <h1>TORTUGA Cybersecurity Framework</h1>
-  <p><em>An Advanced, Idempotent, and Reversible OS Security Orchestrator</em></p>
+  <h1>TORTUGA</h1>
+  <p><em>Applies reversible, leveled security hardening to Windows, Linux, and macOS through a bilingual CLI.</em></p>
 
-  <!-- Badges -->
   <p>
-    <a href="https://github.com/RichSsa24/TORTUGA/actions"><img src="https://img.shields.io/badge/build-passing-brightgreen?style=for-the-badge&logo=githubactions" alt="Build Status"></a>
-    <img src="https://img.shields.io/badge/python-3.10+-blue.svg?style=for-the-badge&logo=python&logoColor=white" alt="Python Version">
-    <img src="https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey?style=for-the-badge" alt="Supported Platforms">
-    <img src="https://img.shields.io/badge/license-MIT-green.svg?style=for-the-badge" alt="License">
+    <a href="https://github.com/RichSsa24/TORTUGA/actions/workflows/ci.yml"><img src="https://github.com/RichSsa24/TORTUGA/actions/workflows/ci.yml/badge.svg" alt="CI Status"></a>
+    <img src="https://img.shields.io/badge/python-3.10+-blue.svg" alt="Python Version">
+    <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License">
   </p>
-
   <p>
-    <a href="#english"><strong>Read in English</strong></a> ·
-    <a href="#español"><strong>Leer en Español</strong></a>
+    <a href="docs/README.es.md"><strong>Documentación en español →</strong></a>
   </p>
 </div>
 
 <br />
 
----
+## Why TORTUGA
 
-<h2 id="english">English</h2>
+| Feature | TORTUGA | privacy.sexy | HardeningKitty | Debloat Scripts |
+| :--- | :--- | :--- | :--- | :--- |
+| **Rollback** | Per-run exact prior state JSON | Generic Windows default scripts | Start-of-run backup only | Usually irreversible |
+| **Impact Prediction** | Checks live state before applying | None | None | None |
+| **Output** | Plain-language WHAT/WHY/UNDO | Script code / jargon | Jargon-heavy audit log | Script code |
+| **Default Mode** | Dry-run (requires `--apply`) | Generates active scripts | Varies | Active execution |
+| **Cross-Platform** | Windows, Linux, macOS | Windows, macOS | Windows only | Varies by script |
 
-**TORTUGA** is a cross-platform, modular security orchestrator designed to bridge the gap between complex system administration and accessible cybersecurity. Built with modern software engineering principles, it allows both novices and system administrators to apply multi-layered hardening configurations safely.
+## Safety Model
 
-Unlike aggressive "debloat" scripts that permanently damage systems, TORTUGA acts as a state machine. It evaluates, predicts, applies, and if necessary, perfectly reverses any system configuration.
+* **Dry-run by default:** Running the CLI scans and reports current state. It writes zero changes unless explicitly passed `--apply`.
+* **Preflight impact prediction:** Before touching a setting, TORTUGA checks if the system actively relies on it (e.g., checking for active SMB sessions before disabling the protocol) and demotes the action if risks are found.
+* **Recorded and reversible:** Every modified registry key or policy is logged in a state file. `tortuga rollback` restores every setting it changed to its recorded prior value.
+* **What it is NOT:** TORTUGA is not an antivirus. It cannot fix a machine that is already compromised. No tool makes a computer "100% secure".
 
-### 🌟 Engineering Highlights
+See [THREAT_MODEL.md](docs/THREAT_MODEL.md) for limits.
 
-This project was developed with a focus on robust software architecture, making it an excellent showcase of modern Python development:
+## Quick Start
 
-* **Idempotent Execution:** The engine evaluates current OS states before applying changes. Running the framework multiple times yields the exact same safe state without redundant operations.
-* **Stateful Transaction Logs:** Every modified registry key, firewall rule, or system policy is recorded in a JSON transaction ledger. This allows for 100% accurate mathematical rollbacks.
-* **Abstract Syntax Tree (AST) CLI:** The command-line interface dynamically parses modules and actions via a Registry Pattern, allowing developers to plug-and-play new security modules without altering core logic.
-* **Test-Driven:** Protected by a comprehensive `pytest` suite ensuring absolute reliability across the Engine, CLI, Transaction Manager, and OS Action layers.
-* **OS-Agnostic Interface:** Seamlessly abstracts PowerShell (`Windows`) and Bash (`Linux`/`macOS`) execution under a unified API layer.
-
-### 🏗️ System Architecture
-
-```mermaid
-graph TD
-    A[User / CLI] -->|Execute harden/rollback| B(Engine Core)
-    B --> C{Action Registry}
-    C -->|Dynamically Loads| D[Security Modules]
-    D --> E[System Hardening]
-    D --> F[Network Security]
-    D --> G[Privacy]
-    B --> H[State Validator]
-    H -->|Preflight Checks| I[Transaction Ledger]
-    I -->|Record State| J[(Local JSON Log)]
-    H -->|Execution| K[OS Action Layer]
-    K --> L[PowerShell / Bash]
-```
-
-### 📚 Security Education
-Beyond software, TORTUGA aims to provide professionally designed, exportable documentation to educate users on real-world threats. (Guides currently in development).
-
-### 🚀 Quick Start
-
-**Prerequisites:** Python 3.10+ and Administrator/Root privileges.
+**Prerequisites:** Python 3.10+. Note: Windows requires elevated PowerShell; Linux/macOS requires `sudo` for `--apply`.
 
 ```bash
-# 1. Clone the repository
 git clone https://github.com/RichSsa24/TORTUGA.git
 cd TORTUGA
-
-# 2. Install dependencies
 pip install -r requirements.txt
 
-# 3. Run a Dry-Run Scan (No changes applied)
+# 1. Dry-run: scan and predict impact without applying
 python -m tortuga harden --module system_hardening --level 3
 
-# 4. Apply Hardening
+# 2. Apply: execute the hardening
 python -m tortuga harden --module system_hardening --level 3 --apply
+# -> Generates a rollback ID, e.g., run_1783053171.json
 
-# 5. Rollback (Undo changes using the generated RUN_ID)
-python -m tortuga rollback <RUN_ID>.json
+# 3. Rollback: undo the specific run
+python -m tortuga rollback run_1783053171.json
 ```
 
----
+## How It Works
 
-<h2 id="español">Español</h2>
+### Levels
+| Level | Intent | Functionality Risk |
+| :--- | :--- | :--- |
+| **1** | Basic Hygiene | Zero risk; enables built-in security features. |
+| **2** | Standard Protection | Low risk; disables legacy protocols not used by most users. |
+| **3** | Hardened Desktop | Moderate risk; restricts background telemetry and tightens permissions. |
+| **4** | Enterprise Strict | High risk; breaks some legacy apps and sharing protocols. |
+| **5** | Maximum Security | Extreme risk; locks down the system for hostile environments. |
 
-**TORTUGA** es un orquestador de seguridad modular y multiplataforma diseñado para cerrar la brecha entre la administración de sistemas compleja y la ciberseguridad accesible. Construido con principios modernos de ingeniería de software, permite tanto a novatos como a expertos aplicar configuraciones de protección por capas de forma segura.
+### Modules
+| Module | Focus |
+| :--- | :--- |
+| `system_hardening` | OS internals, process mitigations, and credential guard. |
+| `network_security` | Firewall rules, protocol disabling (SMBv1, LLMNR), and port filtering. |
+| `privacy` | Telemetry reduction, tracking prevention, and ad-ID blocking. |
 
-A diferencia de los scripts agresivos que dañan los sistemas permanentemente, TORTUGA actúa como una máquina de estados. Evalúa, predice, aplica y si es necesario, revierte perfectamente cualquier configuración del sistema.
+## Usage
 
-### 🌟 Aspectos Destacados de Ingeniería
+TORTUGA supports two primary subcommands:
 
-Este proyecto fue desarrollado con un enfoque en la arquitectura de software robusta (ideal para revisión técnica y reclutadores):
-
-* **Ejecución Idempotente:** El motor evalúa el estado actual del SO antes de aplicar cambios. Ejecutar el framework múltiples veces da como resultado el mismo estado seguro sin operaciones redundantes.
-* **Registro de Transacciones de Estado:** Cada clave de registro, regla de firewall o política modificada se registra en un libro mayor JSON. Esto permite "rollbacks" (reversiones) 100% matemáticamente precisos.
-* **Arquitectura de Plugins (Patrón Registry):** La interfaz de línea de comandos analiza módulos y acciones dinámicamente, permitiendo a los desarrolladores integrar nuevos módulos de seguridad sin alterar la lógica central.
-* **Test-Driven (Guiado por Pruebas):** Protegido por una suite integral de `pytest` que garantiza una fiabilidad absoluta en el Motor, CLI, Gestor de Transacciones y Capas de Acción del SO.
-* **Agnóstico al Sistema Operativo:** Abstrae de forma transparente la ejecución de PowerShell (`Windows`) y Bash (`Linux`/`macOS`) bajo una capa de API unificada.
-
-### 📚 Educación en Ciberseguridad
-Más allá del software, TORTUGA busca proporcionar documentación exportable de diseño profesional para educar a los usuarios sobre amenazas del mundo real. (Guías actualmente en desarrollo).
-
-### 🚀 Guía de Inicio
-
-**Requisitos:** Python 3.10+ y privilegios de Administrador/Root.
-
+### `harden`
+Scan and apply hardening actions.
 ```bash
-# 1. Clonar el repositorio
-git clone https://github.com/RichSsa24/TORTUGA.git
-cd TORTUGA
+# Scan network security up to level 4 (Dry-run)
+python -m tortuga harden --module network_security --level 4
 
-# 2. Instalar dependencias
-pip install -r requirements.txt
-
-# 3. Escaneo de Simulación (Dry-Run, sin aplicar cambios)
-python -m tortuga harden --module system_hardening --level 3 --lang es
-
-# 4. Aplicar Protección
-python -m tortuga harden --module system_hardening --level 3 --lang es --apply
-
-# 5. Reversión (Deshacer cambios usando el RUN_ID generado)
-python -m tortuga rollback <RUN_ID>.json --lang es
+# Apply system hardening in Spanish
+python -m tortuga harden --module system_hardening --level 3 --apply --lang es
 ```
 
----
+### `rollback`
+Rollback a specific transaction log.
+```bash
+# Revert a previous hardening session using its transaction log
+python -m tortuga rollback run_1783053171.json
+```
 
-<div align="center">
-  <p><small>Desarrollado con ❤️ para un entorno digital más seguro. Licencia MIT.</small></p>
-</div>
+## Documentation
+
+| Document | Purpose |
+| :--- | :--- |
+| [CONFIG_MATRIX.md](docs/CONFIG_MATRIX.md) | The exact registry keys and commands run per level. |
+| [LANDSCAPE.md](docs/LANDSCAPE.md) | Detailed comparison with existing tools. |
+| [THREAT_MODEL.md](docs/THREAT_MODEL.md) | What TORTUGA defends against and what it does not cover. |
+
+## Roadmap
+
+- [ ] `ROLLBACK.md` limit and recovery documentation.
+- [ ] Exportable Educational Guides (PDFs).
+- [ ] `browser_hardening` module.
+- [ ] `application_security` module.
+
+## Contributing and Security
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for plugin development and PR guidelines.
+Review [SECURITY.md](SECURITY.md) to report vulnerabilities privately.
+
+## License
+
+MIT License.
