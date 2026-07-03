@@ -30,7 +30,7 @@ class DesignerPDF(FPDF):
         self.set_font("Roboto", "B", 24)
         self.set_text_color(*WHITE)
         self.cell(0, 0, "TORTUGA CYBERSECURITY", align="C")
-        self.ln(12)
+        self.set_y(45) # Set Y below the entire header block
 
     def footer(self):
         self.set_y(-20)
@@ -151,8 +151,7 @@ def create_pdf(filename, title, content_sections):
     pdf = DesignerPDF()
     pdf.add_page()
     
-    # Main Title Header (Below the geometric band)
-    pdf.set_y(45)
+    # Main Title (The header function handles the top banner, so we are at Y=45)
     pdf.set_font("Roboto", "B", 20)
     pdf.set_text_color(*DARK_BLUE)
     pdf.cell(0, 10, title, align="C")

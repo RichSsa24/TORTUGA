@@ -1,5 +1,5 @@
 import json
-import subprocess
+import subprocess # nosec B404
 from dataclasses import dataclass, field
 from typing import Dict, Any, List
 
@@ -50,9 +50,9 @@ class Action:
         """Restores the system to the exact prior state."""
         raise NotImplementedError
 
-    def run_command(self, cmd: List[str]) -> subprocess.CompletedProcess:
+    def _run_subprocess(self, cmd: list[str]) -> subprocess.CompletedProcess:
         """Helper to run a subprocess safely without shell execution."""
-        return subprocess.run(cmd, capture_output=True, text=True, check=False)
+        return subprocess.run(cmd, capture_output=True, text=True, check=False) # nosec B603
         
     def run_ps(self, script_block: str) -> Dict[str, Any]:
         """Runs a PowerShell script block and parses the JSON output."""

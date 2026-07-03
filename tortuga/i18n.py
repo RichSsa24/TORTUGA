@@ -9,7 +9,7 @@ class I18N:
             if loc and loc.startswith("es"):
                 self.lang = "es"
         except Exception:
-            pass
+            pass # nosec B110
 
     def get(self, strings_obj) -> tuple[str, str]:
         if not strings_obj:
