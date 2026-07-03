@@ -1,6 +1,5 @@
 from tortuga.action import Action, PreflightResult, ActionResult, ActionStrings
 from tortuga.registry import registry
-import json
 
 class ActionUAC(Action):
     id = "SH-001"
@@ -15,10 +14,7 @@ class ActionUAC(Action):
     )
 
     def preflight(self) -> PreflightResult:
-        # Checking if UAC is fully disabled
-        script = "@{ value = (Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System' -Name 'EnableLUA' -ErrorAction SilentlyContinue).EnableLUA }"
-        res = self.run_ps(script)
-        is_disabled = res.get("value") == 0
+        # Checking if UAC is fully disabled is skipped for preflight
         return PreflightResult(
             is_active=False,
             impact_message="UAC will prompt for admin actions. Highly recommended.",

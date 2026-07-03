@@ -1,6 +1,5 @@
 import pytest
 import os
-import json
 from tortuga.engine import Engine
 from tortuga.action import Action, PreflightResult, ActionResult, ActionStrings
 from tortuga.registry import registry

@@ -1,4 +1,3 @@
-import pytest
 from click.testing import CliRunner
 from tortuga.cli import cli
 

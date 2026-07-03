@@ -1,6 +1,5 @@
 import click
 from tortuga.engine import Engine
-from tortuga.registry import registry
 from tortuga.i18n import i18n
 
 @click.group()

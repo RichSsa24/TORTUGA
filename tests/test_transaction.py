@@ -1,5 +1,4 @@
 import os
-import json
 from tortuga.transaction import TransactionLog
 
 def test_transaction_creation_and_load(tmp_path):

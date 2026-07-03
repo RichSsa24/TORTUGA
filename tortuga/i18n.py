@@ -8,7 +8,7 @@ class I18N:
             loc, _ = locale.getdefaultlocale()
             if loc and loc.startswith("es"):
                 self.lang = "es"
-        except:
+        except Exception:
             pass
 
     def get(self, strings_obj) -> tuple[str, str]:

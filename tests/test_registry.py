@@ -1,4 +1,3 @@
-import pytest
 from tortuga.registry import ActionRegistry
 from tortuga.action import Action
 

@@ -1,4 +1,3 @@
-import pytest
 from tortuga.i18n import i18n
 from tortuga.action import ActionStrings
 

@@ -1,5 +1,5 @@
 import click
-from typing import List, Optional
+from typing import List
 from tortuga.registry import registry
 from tortuga.transaction import TransactionLog
 
