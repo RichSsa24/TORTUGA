@@ -45,14 +45,14 @@ cd TORTUGA
 pip install -r requirements.txt
 
 # 1. Simulación (dry-run): escanea y predice el impacto sin aplicar
-python -m tortuga harden --module system_hardening --level 3 --lang es
+python -m tortuga harden --module system_hardening --level 3
 
 # 2. Aplicar: ejecuta la configuración de seguridad
-python -m tortuga harden --module system_hardening --level 3 --apply --lang es
+python -m tortuga harden --module system_hardening --level 3 --apply
 # -> Genera un ID de reversión, ej., run_1783053171.json
 
 # 3. Reversión (rollback): deshace la ejecución específica
-python -m tortuga rollback run_1783053171.json --lang es
+python -m tortuga rollback run_1783053171.json
 ```
 
 ## Cómo Funciona
@@ -81,17 +81,17 @@ TORTUGA soporta dos subcomandos principales:
 Escanea y aplica acciones de seguridad.
 ```bash
 # Escanea la seguridad de red hasta el nivel 4 (Modo simulación)
-python -m tortuga harden --module network_security --level 4 --lang es
+python -m tortuga harden --module network_security --level 4
 
 # Aplica la seguridad del sistema
-python -m tortuga harden --module system_hardening --level 3 --apply --lang es
+python -m tortuga harden --module system_hardening --level 3 --apply
 ```
 
 ### `rollback`
 Revierte un registro de transacción específico.
 ```bash
 # Revierte una sesión previa usando su registro de transacción
-python -m tortuga rollback run_1783053171.json --lang es
+python -m tortuga rollback run_1783053171.json
 ```
 
 ## Documentación

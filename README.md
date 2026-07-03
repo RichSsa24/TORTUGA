@@ -83,8 +83,8 @@ Scan and apply hardening actions.
 # Scan network security up to level 4 (Dry-run)
 python -m tortuga harden --module network_security --level 4
 
-# Apply system hardening in Spanish
-python -m tortuga harden --module system_hardening --level 3 --apply --lang es
+# Apply system hardening
+python -m tortuga harden --module system_hardening --level 3 --apply
 ```
 
 ### `rollback`
