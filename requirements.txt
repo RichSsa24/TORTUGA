@@ -1,0 +1,9 @@
+# Core Dependencies
+click==8.1.7          --hash=sha256:ca9853ad459e787e2192211578cc907e6592e994d50f8c5c165d4b4700d6ef34
+colorama==0.4.6       --hash=sha256:0f78d655f45cd867e2a969375e2f75ce6bc4a13f6cc05342bc61e1bd7e411b95
+
+# Development and Testing Dependencies
+pytest==8.0.0
+pytest-mock==3.12.0
+ruff==0.1.14
+bandit==1.7.7
