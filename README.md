@@ -26,7 +26,7 @@
 
 **TORTUGA** is a cross-platform, modular security orchestrator designed to bridge the gap between complex system administration and accessible cybersecurity. Built with modern software engineering principles, it allows both novices and system administrators to apply multi-layered hardening configurations safely.
 
-Unlike aggressive "debloat" scripts that permanently damage systems, TORTUGA acts as a state machine. It evaluates, predicts, applies, and—if necessary—perfectly reverses any system configuration.
+Unlike aggressive "debloat" scripts that permanently damage systems, TORTUGA acts as a state machine. It evaluates, predicts, applies, and if necessary, perfectly reverses any system configuration.
 
 ### 🌟 Engineering Highlights
 
