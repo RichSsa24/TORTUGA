@@ -50,7 +50,7 @@ class Action:
         """Restores the system to the exact prior state."""
         raise NotImplementedError
 
-    def _run_subprocess(self, cmd: list[str]) -> subprocess.CompletedProcess:
+    def run_command(self, cmd: list[str]) -> subprocess.CompletedProcess:
         """Helper to run a subprocess safely without shell execution."""
         return subprocess.run(cmd, capture_output=True, text=True, check=False) # nosec B603
         
