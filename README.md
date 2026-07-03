@@ -56,8 +56,7 @@ graph TD
 ```
 
 ### 📚 Security Education
-Beyond software, TORTUGA provides professionally designed, exportable documentation to educate users on real-world threats:
-* 📄 **[Download: Phishing & Common Cyber Attacks Guide (PDF)](docs/PHISHING_AND_ATTACKS_EN.pdf)**
+Beyond software, TORTUGA aims to provide professionally designed, exportable documentation to educate users on real-world threats. (Guides currently in development).
 
 ### 🚀 Quick Start
 
@@ -100,8 +99,7 @@ Este proyecto fue desarrollado con un enfoque en la arquitectura de software rob
 * **Agnóstico al Sistema Operativo:** Abstrae de forma transparente la ejecución de PowerShell (`Windows`) y Bash (`Linux`/`macOS`) bajo una capa de API unificada.
 
 ### 📚 Educación en Ciberseguridad
-Más allá del software, TORTUGA proporciona documentación exportable de diseño profesional para educar a los usuarios sobre amenazas del mundo real:
-* 📄 **[Descargar: Guía de Phishing y Ataques Comunes (PDF)](docs/PHISHING_Y_ATAQUES_ES.pdf)**
+Más allá del software, TORTUGA busca proporcionar documentación exportable de diseño profesional para educar a los usuarios sobre amenazas del mundo real. (Guías actualmente en desarrollo).
 
 ### 🚀 Guía de Inicio
 
