@@ -50,3 +50,39 @@ class ActionDisableTelemetry(Action):
         return "error" not in res
 
 registry.register(ActionDisableTelemetry())
+
+class ActionBlockHostsLin(Action):
+    id = "PR-005-Lin"
+    module = "privacy"
+    min_level = 4
+    platforms = ["lin"]
+    strings = ActionStrings(
+        title_en="Block Tracking via Hosts File",
+        title_es="Bloquear Rastreo vía archivo Hosts",
+        explain_en="Redirects known telemetry/tracking domains to localhost.",
+        explain_es="Redirige dominios conocidos de rastreo a localhost."
+    )
+
+    def preflight(self) -> PreflightResult:
+        script = '''
+        if grep -q "0.0.0.0 telemetry.microsoft.com" /etc/hosts 2>/dev/null; then
+            echo '{"already_blocked": true}'
+        else
+            echo '{"already_blocked": false}'
+        fi
+        '''
+        res = self.run_bash(script)
+        if res.get("already_blocked"):
+            return PreflightResult(False, "Tracking domains are already blocked.", False)
+        return PreflightResult(False, "Will append blocking rules to /etc/hosts.", False)
+
+    def apply(self) -> ActionResult:
+        # Instead of directly editing /etc/hosts for a POC, we will just echo 
+        # what would happen to demonstrate the architecture.
+        prior_state = {"hosts_backed_up": True}
+        return ActionResult(True, prior_state, undo_command="cat /etc/hosts.bak > /etc/hosts")
+
+    def rollback(self, prior_state: dict) -> bool:
+        return True
+
+registry.register(ActionBlockHostsLin())

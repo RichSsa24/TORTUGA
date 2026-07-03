@@ -28,6 +28,13 @@ class ActionRegistry:
         elif sysname == "darwin":
             return "mac"
         elif sysname == "linux":
+            import os
+            if os.path.exists("/etc/os-release"):
+                with open("/etc/os-release") as f:
+                    content = f.read().lower()
+                    if "ubuntu" in content or "debian" in content:
+                        return "lin"
+            print("[WARNING] Non-Debian/Ubuntu Linux detected. Proceed with caution.")
             return "lin"
         return "unknown"
 

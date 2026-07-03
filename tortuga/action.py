@@ -67,3 +67,15 @@ class Action:
             return json.loads(res.stdout.strip() or "{}")
         except json.JSONDecodeError:
             return {"error": "Failed to parse PowerShell output", "raw": res.stdout}
+
+    def run_bash(self, script_block: str) -> Dict[str, Any]:
+        """Runs a bash script block and parses the JSON output."""
+        # The bash script is expected to output a JSON string at the end.
+        cmd = ["bash", "-c", script_block]
+        res = self.run_command(cmd)
+        if res.returncode != 0 and not res.stdout.strip():
+            return {"error": res.stderr.strip() or f"Bash exited with code {res.returncode}"}
+        try:
+            return json.loads(res.stdout.strip() or "{}")
+        except json.JSONDecodeError:
+            return {"error": "Failed to parse Bash output as JSON", "raw": res.stdout}

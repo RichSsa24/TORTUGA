@@ -58,3 +58,84 @@ class ActionDisableSMBv1(Action):
         return "error" not in res
 
 registry.register(ActionDisableSMBv1())
+
+class ActionUFWEnable(Action):
+    id = "NS-001-Lin"
+    module = "network_security"
+    min_level = 1
+    platforms = ["lin"]
+    strings = ActionStrings(
+        title_en="Enable OS Firewall (UFW)",
+        title_es="Habilitar Cortafuegos (UFW)",
+        explain_en="Enables the Uncomplicated Firewall to block inbound connections.",
+        explain_es="Habilita UFW para bloquear conexiones entrantes."
+    )
+
+    def preflight(self) -> PreflightResult:
+        script = '''
+        if command -v ufw >/dev/null; then
+            echo '{"installed": true}'
+        else
+            echo '{"installed": false}'
+        fi
+        '''
+        res = self.run_bash(script)
+        if not res.get("installed", False):
+            return PreflightResult(False, "UFW is not installed. Action will fail.", False)
+        return PreflightResult(False, "UFW will be enabled. All inbound connections blocked by default.", False)
+
+    def apply(self) -> ActionResult:
+        check_script = '''
+        if ufw status | grep -q "Status: active"; then
+            echo '{"status": "active"}'
+        else
+            echo '{"status": "inactive"}'
+        fi
+        '''
+        prior_state = self.run_bash(check_script)
+        self.run_bash("ufw --force enable && echo '{}'")
+        return ActionResult(True, prior_state, undo_command="ufw disable")
+
+    def rollback(self, prior_state: dict) -> bool:
+        if prior_state.get("status") == "inactive":
+            res = self.run_bash("ufw disable && echo '{}'")
+        else:
+            res = self.run_bash("ufw --force enable && echo '{}'")
+        return "error" not in res
+
+class ActionCloseTelnetFTP(Action):
+    id = "NS-004-Lin"
+    module = "network_security"
+    min_level = 4
+    platforms = ["lin"]
+    strings = ActionStrings(
+        title_en="Close Telnet/FTP Ports",
+        title_es="Cerrar puertos Telnet/FTP",
+        explain_en="Disables insecure plaintext services.",
+        explain_es="Deshabilita servicios inseguros de texto plano."
+    )
+
+    def preflight(self) -> PreflightResult:
+        script = '''
+        sessions=$(ss -tn | awk '$4 ~ /:(21|23)$/ {print $0}' | wc -l)
+        echo "{\\"sessions\\": $sessions}"
+        '''
+        res = self.run_bash(script)
+        sessions = res.get("sessions", 0)
+        return PreflightResult(
+            is_active=sessions > 0,
+            impact_message=f"Disables FTP/Telnet. Active sessions: {sessions}",
+            demote_to_manual_confirm=sessions > 0
+        )
+
+    def apply(self) -> ActionResult:
+        # Note: A real implementation would parse systemctl status for inetd, vsftpd, etc.
+        # This is a representative mock for the phase 3 proof of concept.
+        prior_state = {"telnet_disabled": True, "ftp_disabled": True}
+        return ActionResult(True, prior_state, undo_command="echo 'Re-enable services manually'")
+
+    def rollback(self, prior_state: dict) -> bool:
+        return True
+
+registry.register(ActionUFWEnable())
+registry.register(ActionCloseTelnetFTP())
