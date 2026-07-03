@@ -86,15 +86,17 @@ class ActionUFWEnable(Action):
 
     def apply(self) -> ActionResult:
         check_script = '''
-        if ufw status | grep -q "Status: active"; then
+        if command -v ufw >/dev/null && ufw status | grep -q "Status: active"; then
             echo '{"status": "active"}'
         else
             echo '{"status": "inactive"}'
         fi
         '''
         prior_state = self.run_bash(check_script)
-        self.run_bash("ufw --force enable && echo '{}'")
-        return ActionResult(True, prior_state, undo_command="ufw disable")
+        res = self.run_bash("ufw --force enable && echo '{}'")
+        success = "error" not in res
+        error_msg = res.get("error", "") if not success else ""
+        return ActionResult(success, prior_state, error_message=error_msg, undo_command="ufw disable")
 
     def rollback(self, prior_state: dict) -> bool:
         if prior_state.get("status") == "inactive":
