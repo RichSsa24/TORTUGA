@@ -139,3 +139,48 @@ class ActionCloseTelnetFTP(Action):
 
 registry.register(ActionUFWEnable())
 registry.register(ActionCloseTelnetFTP())
+
+class ActionDisableRemoteLoginMac(Action):
+    id = "NS-005-Mac"
+    module = "network_security"
+    min_level = 4
+    platforms = ["mac"]
+    strings = ActionStrings(
+        title_en="Disable Remote Login (SSH)",
+        title_es="Deshabilitar Inicio de sesión remoto (SSH)",
+        explain_en="Closes SSH to prevent remote unauthorized access.",
+        explain_es="Cierra SSH para prevenir el acceso remoto no autorizado."
+    )
+
+    def preflight(self) -> PreflightResult:
+        script = '''
+        if systemsetup -getremotelogin | grep -q "On"; then
+            echo '{"status": "on"}'
+        else
+            echo '{"status": "off"}'
+        fi
+        '''
+        res = self.run_bash(script)
+        is_on = res.get("status") == "on"
+        return PreflightResult(is_on, "Disabling SSH will terminate existing remote sessions.", is_on)
+
+    def apply(self) -> ActionResult:
+        script_check = '''
+        if systemsetup -getremotelogin | grep -q "On"; then
+            echo '{"status": "on"}'
+        else
+            echo '{"status": "off"}'
+        fi
+        '''
+        prior_state = self.run_bash(script_check)
+        self.run_bash("systemsetup -setremotelogin off && echo '{}'")
+        return ActionResult(True, prior_state, undo_command="systemsetup -setremotelogin on")
+
+    def rollback(self, prior_state: dict) -> bool:
+        if prior_state.get("status") == "on":
+            res = self.run_bash("systemsetup -setremotelogin on && echo '{}'")
+        else:
+            res = self.run_bash("systemsetup -setremotelogin off && echo '{}'")
+        return "error" not in res
+
+registry.register(ActionDisableRemoteLoginMac())

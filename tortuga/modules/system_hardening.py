@@ -101,3 +101,39 @@ class ActionAutorun(Action):
 # Register actions
 registry.register(ActionUAC())
 registry.register(ActionAutorun())
+
+class ActionGatekeeperMac(Action):
+    id = "SH-002-Mac"
+    module = "system_hardening"
+    min_level = 2
+    platforms = ["mac"]
+    strings = ActionStrings(
+        title_en="Enable Gatekeeper",
+        title_es="Habilitar Gatekeeper",
+        explain_en="Ensures only signed and trusted software is allowed to run.",
+        explain_es="Asegura que solo software firmado y de confianza pueda ejecutarse."
+    )
+
+    def preflight(self) -> PreflightResult:
+        return PreflightResult(False, "Prevents running unverified unsigned applications.", False)
+
+    def apply(self) -> ActionResult:
+        script_check = '''
+        if spctl --status | grep -q "assessments enabled"; then
+            echo '{"status": "enabled"}'
+        else
+            echo '{"status": "disabled"}'
+        fi
+        '''
+        prior_state = self.run_bash(script_check)
+        self.run_bash("spctl --master-enable && echo '{}'")
+        return ActionResult(True, prior_state, undo_command="spctl --master-disable")
+
+    def rollback(self, prior_state: dict) -> bool:
+        if prior_state.get("status") == "disabled":
+            res = self.run_bash("spctl --master-disable && echo '{}'")
+        else:
+            res = self.run_bash("spctl --master-enable && echo '{}'")
+        return "error" not in res
+
+registry.register(ActionGatekeeperMac())
