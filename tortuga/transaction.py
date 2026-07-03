@@ -32,5 +32,8 @@ class TransactionLog:
 
     @classmethod
     def load(cls, log_path: str) -> Dict[str, Any]:
-        with open(log_path, 'r', encoding='utf-8') as f:
-            return json.load(f)
+        try:
+            with open(log_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except FileNotFoundError:
+            return None

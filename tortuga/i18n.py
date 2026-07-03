@@ -15,7 +15,7 @@ class I18N:
         if not strings_obj:
             return "No title", "No explanation"
         if self.lang == "es":
-            return strings_obj.title_es, strings_obj.explain_es
+            return strings_obj.title_es or strings_obj.title_en, strings_obj.explain_es or strings_obj.explain_en
         return strings_obj.title_en, strings_obj.explain_en
 
 i18n = I18N()
