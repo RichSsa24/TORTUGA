@@ -93,7 +93,7 @@ class ActionUFWEnable(Action):
         fi
         '''
         prior_state = self.run_bash(check_script)
-        res = self.run_bash("ufw --force enable && echo '{}'")
+        res = self.run_bash("ufw --force enable > /dev/null 2>&1 && echo '{}'")
         success = "error" not in res
         error_msg = res.get("error", "") if not success else ""
         return ActionResult(success, prior_state, error_message=error_msg, undo_command="ufw disable")
