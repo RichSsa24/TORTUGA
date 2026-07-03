@@ -86,7 +86,7 @@ python -m tortuga rollback <RUN_ID>.json
 
 **TORTUGA** es un orquestador de seguridad modular y multiplataforma diseñado para cerrar la brecha entre la administración de sistemas compleja y la ciberseguridad accesible. Construido con principios modernos de ingeniería de software, permite tanto a novatos como a expertos aplicar configuraciones de protección por capas de forma segura.
 
-A diferencia de los scripts agresivos que dañan los sistemas permanentemente, TORTUGA actúa como una máquina de estados. Evalúa, predice, aplica y—si es necesario—revierte perfectamente cualquier configuración del sistema.
+A diferencia de los scripts agresivos que dañan los sistemas permanentemente, TORTUGA actúa como una máquina de estados. Evalúa, predice, aplica y si es necesario, revierte perfectamente cualquier configuración del sistema.
 
 ### 🌟 Aspectos Destacados de Ingeniería
 
